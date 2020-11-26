@@ -2,33 +2,26 @@
 ### week1
 
 ## contents
-01. [overview](#overview)
-02. [자바스크립트](#javascript)
+01. [Overview](#overview)
+02. [JavaScript](#javascript)
 03. git
 
 <!--overview -->
 ## Overview
 
 **Client : 서비스 요청자**
-
 - 서비스를 사용하는 사용자
 
 **Server: 서비스 자원의 제공자**
-
 - 네트워크를 통해 클라이언트에게 서비스 및 정보를 제공, 다른 서버에 요청을 보내기도 함
 
-<br/>
-
 <!-- javascript -->
-
 ## Javascript 
 
 - 코드를 한 줄씩 번역하고 실행 
 - 실행속도가 컴파일 언어에 비해 느림
 - 타입을 명시하지 않음
 - 프로토타입 기반의 객체 지향 언어
-
-<br>
 
 **Hoisting**
 
