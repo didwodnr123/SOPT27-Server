@@ -1,6 +1,6 @@
 ### week1
 
-## contents
+## Contents
 01. [Overview](#overview)
 02. [JavaScript](#javascript)
 03. git
