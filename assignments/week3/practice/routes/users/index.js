@@ -63,7 +63,7 @@ router.post('/signin', (req, res) => {
 
 router.get('/', (req, res) => {
     // 1.모든 유저정보 조회 (id, password, salt)!
-    return res.status(sc.OK).send(util.success(sc.OK, rm.MEMBER_READ_ALL_SUCCESS, usersDBx));
+    return res.status(sc.OK).send(util.success(sc.OK, rm.MEMBER_READ_ALL_SUCCESS, usersDB));
 });
 
 module.exports = router;
