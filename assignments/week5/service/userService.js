@@ -15,7 +15,7 @@ module.exports = {
         }
     },
 
-    signup: (email, userName, password) => {
+    signup: async (email, userName, password) => {
         try{
             const salt = crypto.randomBytes(64).toString('base64');
             const digest = crypto.pbkdf2Sync(password, salt, 1, 64, 'sha512').toString('base64');
@@ -29,5 +29,5 @@ module.exports = {
         } catch(err){
             throw err;
         }
-    }
+    },
 }
