@@ -45,11 +45,14 @@ module.exports = {
         try {
             const alreadyLike = await Like.findOne({
                 where: {
-                    UserId,
+                    [Op.and]: [
+                      { PostId: PostId },
+                      { UserId: UserId }
+                    ]
                 }
             });
             if(alreadyLike){
-                res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, "이미 좋아요 하였습니다."));
+                return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, "이미 좋아요 하였습니다."));
             }
             const like = await Like.create({ PostId, UserId });
             return res.status(sc.OK).send(util.success(sc.OK, rm.CREATE_LIKE_SUCCESS, like));

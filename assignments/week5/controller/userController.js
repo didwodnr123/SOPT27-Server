@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const util = require('../modules/util');
 const rm = require('../modules/responseMessage');
 const sc = require('../modules/statusCode');
-const { User } = require('../models');
+const { User, Post } = require('../models');
 const { userService } = require('../service');
 
 module.exports = {
@@ -93,6 +93,26 @@ module.exports = {
         } catch(err){
             console.error(err);
             return res.send(util.fail(sc.INTERNAL_SERVER_ERROR, rm.USER_DELETE_FAIL));
+        }
+    },
+
+    readUserInfo: async (req, res) => {
+        const { id } = req.params;
+        try {
+            const user = await User.findOne({
+                where: {
+                    id,
+                },
+                attributes: ['email', 'userName'],
+                include: {
+                    model: Post,
+                    attributes: ['id', 'title', 'contents', 'postImageUrl', 'userId']
+                }
+            });
+            return res.status(sc.OK).send(util.success(sc.OK, "회원 정보 조회 성공.", user));
+        } catch(err){
+            console.log(err);
+            return res.status(sc.INTERNAL_SERVER_ERROR).send(util.fail(sc.INTERNAL_SERVER_ERROR, "회원 정보 조회 실패."));
         }
     }
 }
