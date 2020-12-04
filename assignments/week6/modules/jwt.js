@@ -15,6 +15,7 @@ module.exports = {
     };
     return result;
   },
+  
   verify: async (token) => {
     let decoded;
     try {
@@ -33,5 +34,10 @@ module.exports = {
       }
     }
     return decoded;
+  },
+
+  refresh: async (refreshToken) => {
+    // code
+    return refreshToken
   }
 }
