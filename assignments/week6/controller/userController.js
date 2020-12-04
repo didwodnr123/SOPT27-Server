@@ -4,6 +4,7 @@ const rm = require('../modules/responseMessage');
 const sc = require('../modules/statusCode');
 const { User, Post } = require('../models');
 const { userService } = require('../service');
+const jwt = require('../modules/jwt');
 
 module.exports = {
     signup: async (req, res) => {
@@ -23,7 +24,7 @@ module.exports = {
                 return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, rm.ALREADY_EMAIL));;
             }
             const user = await userService.signup(email, userName, password);
-            return res.status(sc.OK).send(util.success(sc.OK, rm.SIGN_UP_SUCCESS, user));
+            return res.status(sc.OK).send(util.success(sc.OK, rm.SIGN_UP_SUCCESS, { id: user.id, email: user.email, userName: user.userName }));
         } catch (err) {
             console.error(err);
             return res.status(sc.INTERNAL_SERVER_ERROR).send(util.fail(sc.INTERNAL_SERVER_ERROR, rm.SIGN_UP_FAIL));
@@ -31,27 +32,35 @@ module.exports = {
     },
 
     signin: async (req, res) => {
-        const {
-            email,
-            password
-        } = req.body; 
-        if(!email || !password){
-            return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, rm.NULL_VALUE));
+        const {email, password} = req.body; 
+  
+        if(!email || !password) {
+        console.log('필요한 값이 없습니다!');
+        return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, rm.NULL_VALUE));
         }
-        try {
-            const user = await userService.emailCheck(email);
-            if(!user){
-                return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, rm.NO_USER));
-            }
-            const { id, userName, salt, password: digest } = user;
-            const inputPwd = crypto.pbkdf2Sync(password, salt, 1, 64, 'sha512').toString('base64');
-            if(inputPwd != digest){
-                return res.status(sc.BAD_REQUEST).send(util.success(sc.BAD_REQUEST, rm.MISS_MATCH_PW));
-            }
-            return res.status(sc.OK).send(util.success(sc.OK, rm.SIGN_IN_SUCCESS, { id, email, userName }));
-        } catch(err) {
-            console.error(err);
-            return res.status(sc.INTERNAL_SERVER_ERROR).send(util.fail(sc.INTERNAL_SERVER_ERROR, rm.SIGN_IN_FAIL));
+        
+        try{
+        const alreadyEmail = await userService.emailCheck(email);
+        if(!alreadyEmail) {
+            console.log('없는 이메일 입니다.');
+            return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, rm.NO_EMAIL));
+        }
+        
+        const { salt } = alreadyEmail;
+        const user = await userService.signin(email, password, salt);
+    
+        if(!user){
+            console.log('비밀번호가 일치하지 않습니다.');
+            return res.status(sc.BAD_REQUEST).send(util.fail(sc.BAD_REQUEST, rm.MISS_MATCH_PW));
+        }
+        const {accessToken , refreshToken } = await jwt.sign(user);
+        return res.status(sc.OK).send(util.success(sc.OK, rm.SIGN_IN_SUCCESS, {
+            accessToken,
+            refreshToken
+        }));
+        } catch (error) {
+        console.error(error);
+        return res.status(sc.INTERNAL_SERVER_ERROR).send(util.fail(sc.INTERNAL_SERVER_ERROR, rm.SIGN_IN_FAIL));
         }
     },
 
@@ -97,7 +106,7 @@ module.exports = {
     },
 
     readUserInfo: async (req, res) => {
-        const { id } = req.params;
+        const { id } = req.decoded;
         try {
             const user = await User.findOne({
                 where: {
