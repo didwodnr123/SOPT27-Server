@@ -69,9 +69,9 @@ module.exports = {
             const users = await User.findAll({
                 attributes: ['id', 'email', 'userName'],
             });
-            res.send(util.success(sc.OK, rm.USER_READ_ALL_SUCCESS, users));
+            res.send(util.success(sc.OK, rm.READ_USER_ALL_SUCCESS, users));
         } catch (err) {
-            res.send(util.fail(sc.INTERNAL_SERVER_ERROR, rm.USER_READ_ALL_FAIL));
+            res.send(util.fail(sc.INTERNAL_SERVER_ERROR, rm.READ_USER_ALL_FAIL));
         }
     },
 
